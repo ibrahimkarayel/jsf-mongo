@@ -1,0 +1,34 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:property-placeholder location="classpath:persistence-config.properties"/>
+    <!-- MongoDB -->
+    <bean id="morphia" class="com.google.code.morphia.Morphia"/>
+
+    <bean id="mongo" class="com.mongodb.Mongo">
+        <constructor-arg value="${mongoDB.connection.host}"/>
+        <constructor-arg value="${mongoDB.connection.port}"/>
+    </bean>
+
+    <bean id="datastore" class="com.pironix.dao.mongodb.DatastoreFactoryBean">
+        <property name="morphia" ref="morphia"/>
+        <property name="mongo" ref="mongo"/>
+        <property name="dbName" value="${mongoDB.dbName}"/>
+    </bean>
+
+    <bean id="userDAO" class="com.pironix.dao.mongodb.UserDAO">
+        <constructor-arg index="0" ref="morphia"/>
+        <constructor-arg index="1" ref="mongo"/>
+    </bean>
+
+    <bean id="userMongoService" class="com.pironix.service.mongodb.impl.UserService">
+        <property name="userDAO" ref="userDAO"/>
+    </bean>
+
+</beans>

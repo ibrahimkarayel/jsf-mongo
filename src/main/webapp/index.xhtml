@@ -1,0 +1,168 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:k="http://xmlns.jcp.org/jsf/passthrough">
+<h:head>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/custom.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet"/>
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css"/>
+    <link href="css/bootstrap-glyphicons.css" rel="stylesheet"/>
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet"/>
+    <title>JSF Spring and MongoDB </title>
+</h:head>
+<h:body>
+
+    <ui:include src="header.xhtml"/>
+
+    <h:outputLink id="addLink" style="padding-left: 120px;" value="javascript:void(0)" onclick="addDialog.show()"
+                  icon="ui-icon-add"
+                  title="Add New User">
+        Add New User
+    </h:outputLink>
+    <br/><br/>
+
+
+    <h:panelGroup id="padding" layout="block" styleClass="align-center" style="padding-left: 90px;">
+        <h:form id="userForm">
+            <p:dataTable var="user" style="width: 80%" value="#{userMB.userList}" id="userList" editable="true"
+                         paginator="true" rows="10"
+                         lazy="true" rowSelectMode="single" selection="#{userMB.selectedUser}" rowKey="#{user.id}">
+                <!--p:column>
+                    <f:facet name="header">
+                        <h:outputText value="ID"/>
+                    </f:facet>
+                    <h:outputText value="{user.id}"/>
+                </p:column-->
+                <p:column style="width:150px;">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{user.name}"/>
+                </p:column>
+                <p:column style="width:150px;">
+                    <f:facet name="header">
+                        <h:outputText value="Surname"/>
+                    </f:facet>
+                    <h:outputText value="#{user.surname}"/>
+                </p:column>
+                <p:column style="width:150px;">
+                    <f:facet name="header">
+                        <h:outputText value="Phone"/>
+                    </f:facet>
+                    <h:outputText value="#{user.phone}"/>
+                </p:column>
+
+                <p:column style="width:110px;">
+                    <f:facet name="header">
+                        <h:outputText value="Update User"/>
+                    </f:facet>
+                    <p:commandButton id="selectForUpdateButton" onclick="PF('updateDialog').show()"
+                                     icon="/img/user-update-icon.png"
+                                     title="update" ajax="true">
+                        <f:setPropertyActionListener value="#{user}" target="#{userMB.selectedUser}"/>
+                    </p:commandButton>
+                    <!--<button data-target="#changeStatus" data-toggle="modal">-->
+                    <!--<span class="glyphicon glyphicon-pencil">Update</span></button>-->
+                    <!--<br/>-->
+                </p:column>
+                <p:column style="width:110px;">
+                    <f:facet name="header">
+                        <h:outputText value="Delete User"/>
+                    </f:facet>
+                    <h:commandButton value="Delete"
+                                     image="/img/user-remove-icon.png" style="width:25px;height:25px;" update=":padding"
+                                     onclick="return confirm('Warning: This User will be deleted - Do you confirm this?');">
+                        <f:ajax listener="#{userMB.deleteUser(user)}" render="@form"/>
+                    </h:commandButton>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+    </h:panelGroup>
+    <p:dialog id="dialog" header="User Form" widgetVar="addDialog" resizable="false"
+              width="400" showEffect="clip" hideEffect="fold">
+        <h:form id="dialogForm" enctype="multipart/form-data" accept-charset="UTF-8">
+            <p:messages autoUpdate="true"/>
+
+            <div class="pull-left">
+                <h:outputLabel for="name" value="Name: "/>
+                <p:inputText id="name" value="#{userMB.name}" required="true"
+                             requiredMessage="User Name is required" k:placeholder="Name">
+                    <f:validateLength minimum="3"/>
+
+                </p:inputText>
+            </div>
+            <div class="pull-left" style="width: 200px">
+                <h:outputLabel for="surname" value="Surname: "/>
+                <p:inputText id="surname" value="#{userMB.surname}" required="true" k:placeholder="Surname"
+                             requiredMessage="User Surname is required">
+                    <f:validateLength minimum="3"/>
+
+                </p:inputText>
+            </div>
+            <div class="pull-left">
+                <h:outputLabel for="phone" value="Phone:"/>
+                <p:inputMask value="#{userMB.phone}" id="phone" mask="(999) 999-9999" required="true"
+                             k:placeholder="5XX XXXXXXX">
+                    <f:validateLength maximum="14" minimum="4"/>
+                </p:inputMask>
+            </div>
+            <div class="pull-left">
+                <p:captcha id="captcha" theme="white" language="en"/>
+            </div>
+
+            <div class="pull-right">
+                <p:commandButton id="loginButton" value="Add"
+                                 actionListener="#{userMB.addUser}" update=":padding"
+                                 oncomplete="handleAddRequest(xhr, status, args)"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="dialog2" header="Update Form" widgetVar="updateDialog" resizable="false"
+              width="400" showEffect="clip" hideEffect="fold">
+        <h:form id="updateDialogForm" enctype="multipart/form-data" accept-charset="UTF-8">
+            <p:messages autoUpdate="true"/>
+
+            <div class="pull-left">
+                <h:outputLabel for="name" value="Name: "/>
+                <p:inputText id="updatename" value="#{userMB.name}"
+                             k:placeholder="name">
+                    <f:validateLength minimum="3"/>
+                </p:inputText>
+            </div>
+            <div class="pull-left">
+                <h:outputLabel for="surname" value="surname: "/>
+                <p:inputText id="updatesurname" value="#{userMB.surname}"
+                             k:placeholder="surname">
+                    <f:validateLength minimum="2"/>
+                </p:inputText>
+            </div>
+            <div class="pull-left">
+                <h:outputLabel for="phone" value="Phone:"/>
+                <p:inputMask value="#{userMB.phone}" id="updatephone" mask="(999) 999-9999"
+                             k:placeholder="5XX XXXXXXX">
+                    <f:validateLength maximum="14" minimum="4"/>
+                </p:inputMask>
+            </div>
+
+            <div class="pull-right">
+                <p:commandButton id="updateButton" value="Update"
+                                 actionListener="#{userMB.updateUser}" update=":padding"
+                                 oncomplete="handleUpdateRequest(xhr, status, args)"/>
+            </div>
+        </h:form>
+    </p:dialog>
+</h:body>
+</html> 
