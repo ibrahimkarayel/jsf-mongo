@@ -175,7 +175,7 @@
                     <path>/pironix</path>
                 </configuration>
             </plugin>
-            <!-- Compiler plugin enforces Java 1.6 -->
+            <!-- Compiler plugin enforces Java 1.7 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
