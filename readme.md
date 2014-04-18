@@ -1,7 +1,7 @@
 pironix
 
 It is basic JSF, spring, Mongo DB and Bootstrap Project
-Basically it provides insert update delete functionality with validation
+* Basically it provides insert update delete functionality with validation
 * It needs mongo running on local 
 * Any app server should be fine but I have worked with apache-tomcat-7.0.47
 * http://localhost:8080/pironix/
